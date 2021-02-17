@@ -16,7 +16,7 @@ export function handleAddUser(data){
   return service({
     url:'/users',
     method:'post',
-   data
+    data
   })
 }
 
@@ -25,7 +25,7 @@ export function handleUserInfo(id){
   return service({
     url:'/users/' + id,
     method:'get',
-  id
+    id
   })
 }
 

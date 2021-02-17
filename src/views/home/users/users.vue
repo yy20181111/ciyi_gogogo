@@ -98,12 +98,11 @@
       </span>
     </el-dialog>
     <!-- 修改用户dialog -->
-    <el-dialog title="修改用户" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
+    <el-dialog title="修改用户" :visible.sync="editDialogVisible" width="50%">
       <el-form label-width="70px" :model="editForm" ref="editFormRef" :rules="editFormRules">
         <el-form-item label="用户名">
           <el-input v-model="editForm.username" disabled></el-input>
         </el-form-item>
-
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="editForm.email"></el-input>
         </el-form-item>
@@ -111,7 +110,6 @@
           <el-input v-model="editForm.mobile"></el-input>
         </el-form-item>
       </el-form>
-
       <span slot="footer" class="dialog-footer">
         <el-button @click="noEdit">取 消</el-button>
         <el-button type="primary" @click="editUserInfo">确 定</el-button>
@@ -245,30 +243,27 @@ export default {
       this.$notify.success("已查询到该用户");
       this.editForm = res.data;
     },
-    //监听对话框关闭重置
-    editDialogClosed() {
-      this.$refs.editFormRef.resetFields();
-    },
+
     // 确定修改
     editUserInfo() {
-     this.editDialogVisible = false,
+      (this.editDialogVisible = false),
         this.$refs.editFormRef.validate(async valid => {
           if (!valid) return this.$message.Error("不对!");
           //发起请求修改
-          const { data: res } = await handleReUserInfo( this.editForm.id, {email:this.editForm.email,mobile:this.editForm.mobile}
-          );
-          this.getUserList()
-          this.$message.success('修改成功')
+          const { data: res } = await handleReUserInfo(this.editForm.id, {
+            email: this.editForm.email,
+            mobile: this.editForm.mobile
+          });
+          this.getUserList();
+          this.$message.success("修改成功");
           console.log(this.editForm.id);
           console.log(res);
         });
     },
     //取消修改
-  noEdit(){
-     this.editDialogVisible = false,
-this.$message.warning('已取消修改')
-
-  },
+    noEdit() {
+      (this.editDialogVisible = false), this.$message.warning("已取消修改");
+    },
     //删除用户
     async deleteUser(id) {
       // console.log(id);

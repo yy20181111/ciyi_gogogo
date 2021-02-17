@@ -15,9 +15,6 @@ service.interceptors.request.use(
     console.log(err)
   }
 )
-
-
-
 // 响应拦截
 service.interceptors.response.use(res => {
   return res
