@@ -54,26 +54,16 @@
           <!-- 操作按钮 -->
           <template slot-scope="scope">
             <!-- 修改按钮 -->
-            <el-button
-              type="primary"
-              icon="el-icon-edit"
-              size="mini"
-              @click="showEditDialog(scope.row.id)"
-            >编辑</el-button>
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row.id)" >编辑</el-button>
             <!-- 删除按钮 -->
-            <el-button
-              type="danger"
-              icon="el-icon-delete"
-              size="mini "
-              @click="deleteRole(scope.row.id)"
-            >删除</el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini " @click="deleteRole(scope.row.id)" >删除</el-button>
             <!-- 分配权限 -->
             <el-tooltip effect="dark" content="分配权限" placement="top" :enterable="false">
               <el-button
                 type="warning"
                 icon="el-icon-setting"
                 size="mini"
-                @click=" setRightDialog(scope.row.id)"
+                @click=" setRightDialog(scope.$index, scope.row.id)"
               >分配权限</el-button>
             </el-tooltip>
           </template>
@@ -112,10 +102,11 @@
     </el-dialog>
     <!-- 分配权限dialog -->
     <el-dialog title="分配权限" :visible.sync="setRightDialogVisible">
-      <el-tree :data="rightsTrees" show-checkbox node-key="id" :default-expanded-keys="checkdTreesId" :props="rightsTreesProps" :default-expand-all="true" ></el-tree>
+      <el-tree :data="rightsTrees" :props="rightsTreesProps" show-checkbox node-key="id" :default-checked-keys="checkdTreesId"  :default-expand-all="true" 
+       @check-change="changeNode"></el-tree>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="setRightDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="setRightDialogVisible = false">确 定</el-button>
+        <el-button @click="reSetRightDialog">取 消</el-button>
+        <el-button type="primary" @click="confirmSetRight">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -129,7 +120,8 @@ import {
   handleRolesInfo,
   editRoles,
   deleteRolesRight,
-  getRightsTree
+  getRightsTree,
+  setRight
 } from "@/api/request/rights";
 export default {
   data() {
@@ -162,7 +154,9 @@ export default {
         children: "children"
       },
       //默认选中权限id
-      checkdTreesId: []
+      checkdTreesId: [],
+      tempArr: [], // 临时保存递归权限的id
+      roleId: null,
     };
   },
   created() {
@@ -221,8 +215,7 @@ export default {
       const { data: res } = await handleRolesInfo(id);
       if (res.meta.status !== 200) {
         return this.$message.error("查询失败");
-      }
-      console.log(res);
+      } 
       this.$notify.success("已查询到该角色");
       this.editRoles = res.data;
       console.log(res.data.roleId);
@@ -251,24 +244,62 @@ export default {
           type: "warning"
         }
       ).catch(err => err);
-      // console.log(res);
       if (res !== "confirm") return this.$notify.error("已取消");
-
       let result = await deleteRolesRight(roleId, rightId);
-      console.log(result);
+      if(result) {
+        this.$notify.success("已删除");
+      }
       this.getRoles();
-      this.$notify.success("已删除");
+      
     },
     //获取dialog权限列表
-    async setRightDialog() {
+    setRightDialog(index, id) {
+      this.roleId = id
+      this.getAllRole(index)
+    },
+    // 获取所有的权限 渲染树形
+    async getAllRole (index){
       const { data: res } = await getRightsTree();
-      this.setRightDialogVisible = true;
-      if (res.meta.status != 200) return this.$notify.error("获取权限列表失败");
-      this.$message.success(res.meta.msg);
       this.rightsTrees = res.data;
-      console.log(this.rightsTrees);
+      console.log( this.rightsTrees)
+      // 默认选中
+      this.checkdTreesId = this.getRoleId(this.rolesData[index].children)
+      this.setRightDialogVisible = true;
+    },
+    //递归获取角色下的所有权限id   出口   入口 
+    getRoleId (roles){ 
+      roles.forEach(item => {
+        if(!item.children) {
+          this.tempArr.push(item.id)
+        } else {
+          this.getRoleId(item.children)
+        }
+      })
+      return this.tempArr
+    },
+
+    // 选中树形的回调
+    changeNode (node){
+     this.checkdTreesId.push(node.id)
+
+    },
+    // 确认分配权限
+    async confirmSetRight (){
+      let ids = this.checkdTreesId.join(",")
+      console.log(this.checkdTreesId)
+      let res = await setRight(this.roleId,{rids: ids})
+      console.log(res)
+      if(res.data.meta.status === 200 ) {
+        this.$notify.success("分配成功");
+        this.setRightDialogVisible = false
+        this.getRoles();
+      }
+    },
+    //点击取消重置dialog
+    reSetRightDialog(){
+           this.setRightDialogVisible = false
+this.getAllRole()
     }
-    //递归获取角色下的所有权限id
   }
 };
 </script>

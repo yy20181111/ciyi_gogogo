@@ -42,8 +42,7 @@ export function delRoles(id){
 export function handleRolesInfo(id){
   return service({
     url:'/roles/' + id,
-    method:'get',
-  id
+    method:'get'
   })
 }
 //编辑角色
@@ -83,7 +82,7 @@ export function getRightsTree(){
 //分配权限
 export function setRight(id,data){
   return service({
-    url:'/roles/' + id + '/rights/' ,
+    url:'/roles/' + id + '/rights' ,
     method:'post',
     data
   })
