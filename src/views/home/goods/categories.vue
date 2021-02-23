@@ -12,22 +12,9 @@
         <el-button type="primary" @click="addClassdialogVisible  = true">添加分类</el-button>
       </el-row>
       <!-- 表格 -->
-      <tree-table
-        :data="cateList" max-height='500'
-        :columns="columns"
-        :selection-type="false"
-        :expand-type="false"
-        :show-index="true"
-        index-text="#"
-        border
-        :show-row-hover="false"
-      >
+      <tree-table :data="cateList" max-height='500' :columns="columns" :selection-type="false" :expand-type="false" :show-index="true" index-text="#" border :show-row-hover="false" >
         <template slot="isok" slot-scope="scope">
-          <i
-            class="el-icon-success"
-            style="color:lightgreen;font-size:18px"
-            v-if="scope.row.cat_deleted === false"
-          ></i>
+          <i class="el-icon-success" style="color:lightgreen;font-size:18px" v-if="scope.row.cat_deleted === false"  ></i>
           <i class="el-icon-error" v-else></i>
         </template>
         <!-- 排序 -->
