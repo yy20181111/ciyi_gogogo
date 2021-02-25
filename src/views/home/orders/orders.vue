@@ -23,7 +23,7 @@
              ￥ {{scope.row.order_price}} 
           </template>
         </el-table-column>
-        <el-table-column label="地址" prop="consignee_addr"></el-table-column>
+        <!-- <el-table-column label="地址" prop="consignee_addr"></el-table-column> -->
         <el-table-column label="是否付款">
           <template slot-scope="scope">
             <el-tag type="warning" v-if="scope.row.pay_status == '0'">未付款</el-tag>

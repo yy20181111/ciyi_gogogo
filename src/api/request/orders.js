@@ -11,4 +11,11 @@ export function handleOrdersList ( query, pagenum, pagesize){
   })
 }
 
-
+//折线图数据(渲染echarts)
+export function handleReportType (){
+  return service({
+    url: '/reports/type/1',
+    method: 'get',
+   
+  })
+}
